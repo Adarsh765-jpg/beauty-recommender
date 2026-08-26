@@ -26,7 +26,7 @@ jobs:
           ruff format --check .
 
       - name: Mypy
-        run: mypy api tests
+        run: mypy backend tests
 
       - name: Pytest
         run: pytest
@@ -34,6 +34,9 @@ jobs:
   frontend:
     name: Frontend (lint, types, build)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v5
 
@@ -41,6 +44,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci

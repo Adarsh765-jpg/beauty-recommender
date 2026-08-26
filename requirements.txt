@@ -1,5 +1,0 @@
-# Runtime dependencies for the deployed Vercel Python function.
-# Deliberately minimal: all pandas/scikit-learn work happens offline and ships
-# as precomputed artifacts. See requirements-dev.txt for the offline pipeline.
-fastapi==0.141.1
-numpy==2.5.2

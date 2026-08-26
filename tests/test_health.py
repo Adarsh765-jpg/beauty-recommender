@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from api.index import app
+from backend.main import app
 
 client = TestClient(app)
 
@@ -12,9 +12,17 @@ client = TestClient(app)
 def test_health_returns_ok() -> None:
     response = client.get("/api/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+
+    body = response.json()
+    assert body["status"] == "ok"
+    assert body["received_path"] == "/api/health"
 
 
-def test_health_is_namespaced_under_api() -> None:
-    """Vercel does not strip the /api prefix, so an unprefixed route must 404."""
-    assert client.get("/health").status_code == 404
+def test_unmatched_route_reports_received_path() -> None:
+    """An unmatched path must identify itself rather than 404 silently."""
+    response = client.get("/health")
+    assert response.status_code == 404
+
+    body = response.json()
+    assert body["error"] == "no_route"
+    assert body["received_path"] == "/health"

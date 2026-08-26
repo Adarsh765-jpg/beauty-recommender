@@ -17,9 +17,6 @@ python_version = "3.12"
 strict = true
 warn_unreachable = true
 exclude = ["node_modules", "\\.next", "data"]
-# api/ has no __init__.py on purpose: Vercel's file-based routing treats every
-# .py file under api/ as a function entrypoint. Resolve modules from the repo
-# root instead so api/index.py is seen only as "api.index".
 mypy_path = "."
 explicit_package_bases = true
 namespace_packages = true
