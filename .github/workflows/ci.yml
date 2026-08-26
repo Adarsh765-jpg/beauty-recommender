@@ -48,6 +48,11 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      # Next 16 generates route types (LayoutProps, PageProps) into .next/types.
+      # tsc cannot resolve them on a clean checkout unless we generate first.
+      - name: Generate route types
+        run: npx next typegen
+
       - name: TypeScript
         run: npx tsc --noEmit
 
