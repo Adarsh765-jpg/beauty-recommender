@@ -5,8 +5,6 @@ Explainable, personalized skincare recommendations on the Sephora product catalo
 **Live:** https://beauty-recommender.vercel.app  
 **Repo:** https://github.com/Adarsh765-jpg/beauty-recommender
 
-> Note: production must be redeployed from this codebase for `/api/recommend` and the quiz UI to work. Until then, run locally (below).
-
 ---
 
 ## Problem & motivation
@@ -133,15 +131,16 @@ Interactive docs: http://127.0.0.1:8000/api/docs
 
 ## Evaluation
 
-Offline gates live under `reports/`:
+Offline gates live under `reports/`. Human-readable summary: [`docs/BENCHMARK.md`](docs/BENCHMARK.md).
 
 | Report | Purpose |
 |---|---|
-| `baseline_gate.json` | Baseline hit-rate / ranking quality on val queries |
-| `ablation_gate.json` | Ablate content / cohort / quality |
-| `embedding_compare.json` | TF-IDF vs embedding offline tradeoff |
+| `baseline_gate.json` | Content vs popularity / random / rating on val |
+| `ablation_gate.json` | Ablate content / cohort / quality; weight sweep |
+| `embedding_compare.json` | TF-IDF vs sentence-transformers cost/quality |
+| `cohort_coverage.json` | Fraction of skin-type pairs with enough reviews |
 
-Metrics used: hit rate@K, ranking quality proxies, latency considerations for serving TF-IDF offline. Cohort prior was kept (+hit rate); TF-IDF chosen over heavier embeddings for deploy cost.
+**Headline decisions:** content beats popularity (gate pass); keep cohort prior (+0.62 pp hit_rate@10); ship TF-IDF over embeddings for size/cold-start.
 
 Run tests:
 
@@ -172,11 +171,11 @@ See [`docs/TEST_CASES.md`](docs/TEST_CASES.md) for successful and failure scenar
 ## Known limitations
 
 - No product images in the dataset (placeholders in UI)
-- Cohort coverage is uneven for rare skin-type × product cells
+- Cohort coverage is uneven for rare skin-type × product cells (~18.6% of pairs meet the review minimum)
 - Ingredient exclusion rules are keyword-based, not dermatologist-validated
 - Category filter is exact secondary/tertiary match
-- Production must be redeployed with this tree for full functionality
 - `filtered_count` in the API = products **rejected** by filters; `candidate_count` = eligible
+- Absolute unrestricted hit rates are low; see [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for interpretation
 
 ---
 
