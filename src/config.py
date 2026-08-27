@@ -104,7 +104,7 @@ W_CONCERN = 0.34
 W_TEXT = 0.32
 
 # Final-score mixing weights (validated on val; Phase 8).
-# Grid best was α=0.50, β=0.35, γ=0.15 (hit_rate@10 0.020 vs 0.011 here).
+# Grid best was alpha=0.50, beta=0.35, gamma=0.15 (hit_rate@10 0.020 vs 0.011 here).
 # Kept the conservative 0.60/0.25/0.15 mix to avoid chasing sparse val noise.
 ALPHA = 0.60
 BETA = 0.25

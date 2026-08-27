@@ -63,10 +63,8 @@ def run_ablation_gate(
     cohort_delta_hr = ablations["comparison"]["full_vs_no_cohort"]["delta_hit_rate@10"]
     cohort_delta_mrr = ablations["comparison"]["full_vs_no_cohort"]["delta_mrr"]
     n_queries = int(ablations.get("queries") or 0)
-    full_hits = int(round(float(full["hit_rate@10"]) * n_queries)) if n_queries else None
-    no_cohort_hits = (
-        int(round(float(no_cohort["hit_rate@10"]) * n_queries)) if n_queries else None
-    )
+    full_hits = round(float(full["hit_rate@10"]) * n_queries) if n_queries else None
+    no_cohort_hits = round(float(no_cohort["hit_rate@10"]) * n_queries) if n_queries else None
 
     cohort_keeps = cohort_delta_hr >= 0.0 or cohort_delta_mrr >= 0.0
 
@@ -77,7 +75,10 @@ def run_ablation_gate(
             "skipped: sentence-transformers not installed; TF-IDF remains shipped default"
         )
     else:
-        emb_delta = embedding["delta"]["hit_rate@10"]
+        embedding_delta = embedding.get("delta")
+        if not isinstance(embedding_delta, dict):
+            raise TypeError("embedding comparison payload missing delta metrics")
+        emb_delta = float(embedding_delta["hit_rate@10"])
         tfidf_beats_embeddings = emb_delta <= 0.0
         ship_tfidf = True
         if tfidf_beats_embeddings:

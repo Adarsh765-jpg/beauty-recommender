@@ -25,8 +25,15 @@ jobs:
           ruff check .
           ruff format --check .
 
-      - name: Mypy
-        run: mypy backend engine src tests
+      - name: Mypy (engine, src, tests)
+        run: mypy
+
+      - name: Prepare backend runtime copy
+        run: python scripts/prepare_backend.py
+
+      - name: Mypy (backend service root)
+        working-directory: backend
+        run: mypy --config-file=../pyproject.toml --explicit-package-bases main.py recommend_service.py schemas.py
 
       - name: Pytest
         run: pytest

@@ -61,7 +61,14 @@ def run_baseline_gate(
             seed=seed,
             output_path=reports_dir / "weight_tuning.json",
         )
-        best_weights = ContentWeights(**tuning["best_weights"])
+        best_raw = tuning["best_weights"]
+        if not isinstance(best_raw, dict):
+            raise TypeError("tune_content_weights must return best_weights as a mapping")
+        best_weights = ContentWeights(
+            w_skin=float(best_raw["w_skin"]),
+            w_concern=float(best_raw["w_concern"]),
+            w_text=float(best_raw["w_text"]),
+        )
 
         tuned_eval = run_evaluation(
             split_name=split_name,

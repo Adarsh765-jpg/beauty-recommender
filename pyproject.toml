@@ -16,9 +16,13 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
 python_version = "3.12"
 strict = true
 warn_unreachable = true
-exclude = ["node_modules", "\\.next", "data"]
+# Typecheck the source-of-truth packages. The backend/ tree is checked separately
+# (sibling imports + a copied engine/ package confuse a single mypy run).
+files = ["engine", "src", "tests"]
 mypy_path = "."
+exclude = ["node_modules", "\\.next", "data", "backend"]
 explicit_package_bases = true
+
 [tool.ruff.lint.per-file-ignores]
 "src/audit/run_audit.py" = ["E501", "RUF001"]
 "tests/test_preprocessing.py" = ["E501"]
@@ -26,8 +30,12 @@ explicit_package_bases = true
 "backend/recommend_service.py" = ["I001"]
 
 [[tool.mypy.overrides]]
-module = ["pandas.*", "sklearn.*"]
+module = ["pandas.*", "sklearn.*", "recommend_service", "schemas", "backend.recommend_service", "backend.schemas"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["backend.main"]
+disable_error_code = ["import-not-found", "no-any-return"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

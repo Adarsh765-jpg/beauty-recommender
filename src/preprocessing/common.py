@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import re
+import warnings
 from typing import Any
 
 import pandas as pd
@@ -31,10 +32,21 @@ def parse_stringified_list(raw: object) -> list[str]:
     if not text:
         return []
 
+    # Ingredient cells often embed Water\Aqua\Eau. Those backslashes are not
+    # Python escapes; doubling them keeps literal_eval quiet on 3.12+ and
+    # preserves a stable token string for keyword matching.
+    sanitized = text.replace("\\", "\\\\")
     try:
-        parsed = ast.literal_eval(text)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)
+            parsed = ast.literal_eval(sanitized)
     except (SyntaxError, ValueError):
-        return []
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", SyntaxWarning)
+                parsed = ast.literal_eval(text)
+        except (SyntaxError, ValueError):
+            return []
 
     if not isinstance(parsed, list):
         return []
@@ -43,7 +55,7 @@ def parse_stringified_list(raw: object) -> list[str]:
     for item in parsed:
         if item is None:
             continue
-        cleaned = collapse_whitespace(str(item))
+        cleaned = collapse_whitespace(str(item).replace("\\", "/"))
         if cleaned:
             items.append(cleaned)
     return items
