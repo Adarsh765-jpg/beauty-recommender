@@ -8,10 +8,11 @@ import pandas as pd
 import pytest
 
 from engine.artifacts import ArtifactBundle, load_artifacts
-from src.config import DATA_ARTIFACTS, DATA_INTERIM, REPORTS_SMOKE_DIR
+from src.config import DATA_ARTIFACTS, REPORTS_SMOKE_DIR
 from src.evaluation.evaluate import run_evaluation
 from src.evaluation.protocol import build_eval_instances
 from src.evaluation.split import temporal_split, verify_no_temporal_overlap
+from tests.conftest import require_clean_reviews
 
 
 @pytest.fixture(scope="module")
@@ -22,8 +23,7 @@ def artifacts() -> ArtifactBundle:
 
 
 def test_random_baseline_integration_is_low(artifacts: ArtifactBundle) -> None:
-    if not (DATA_INTERIM / "reviews_clean.parquet").exists():
-        pytest.skip("cleaned reviews missing")
+    require_clean_reviews()
 
     REPORTS_SMOKE_DIR.mkdir(parents=True, exist_ok=True)
     result = run_evaluation(
@@ -42,6 +42,7 @@ def test_random_baseline_integration_is_low(artifacts: ArtifactBundle) -> None:
 
 
 def test_evaluation_writes_report(artifacts: ArtifactBundle) -> None:
+    require_clean_reviews()
     REPORTS_SMOKE_DIR.mkdir(parents=True, exist_ok=True)
     report_path = REPORTS_SMOKE_DIR / "evaluation_val_smoke.json"
     result = run_evaluation(
@@ -59,7 +60,8 @@ def test_evaluation_writes_report(artifacts: ArtifactBundle) -> None:
 
 
 def test_test_split_not_used_by_default_smoke(artifacts: ArtifactBundle) -> None:
-    reviews = temporal_split(pd.read_parquet(DATA_INTERIM / "reviews_clean.parquet"))
+    reviews_path = require_clean_reviews()
+    reviews = temporal_split(pd.read_parquet(reviews_path))
     assert verify_no_temporal_overlap(reviews)
 
     catalog_by_id = {item["product_id"]: item for item in artifacts.catalog}

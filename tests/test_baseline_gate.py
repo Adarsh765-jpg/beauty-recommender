@@ -7,9 +7,11 @@ from pathlib import Path
 
 from src.config import REPORTS_SMOKE_DIR
 from src.evaluation.run_baseline_gate import run_baseline_gate
+from tests.conftest import require_clean_reviews
 
 
 def test_baseline_gate_smoke() -> None:
+    require_clean_reviews()
     result = run_baseline_gate(
         max_queries=10,
         seed=11,

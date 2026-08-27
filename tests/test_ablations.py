@@ -11,6 +11,7 @@ from engine.ranking import _final_score, default_ranking_config
 from engine.types import MixingWeights, RankingConfig, RankingFlags
 from src.config import ALPHA, BETA, GAMMA, REPORTS_SMOKE_DIR
 from src.evaluation.run_ablation_gate import run_ablation_gate
+from tests.conftest import require_clean_reviews
 
 
 def test_final_score_ablation_flags() -> None:
@@ -38,6 +39,7 @@ def test_final_score_ablation_flags() -> None:
 
 
 def test_ablation_gate_smoke() -> None:
+    require_clean_reviews()
     result = run_ablation_gate(
         max_queries=8,
         seed=7,
