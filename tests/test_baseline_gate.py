@@ -10,7 +10,12 @@ from src.evaluation.run_baseline_gate import run_baseline_gate
 
 
 def test_baseline_gate_smoke() -> None:
-    result = run_baseline_gate(max_queries=10, seed=11, reports_dir=REPORTS_SMOKE_DIR, skip_tuning=True)
+    result = run_baseline_gate(
+        max_queries=10,
+        seed=11,
+        reports_dir=REPORTS_SMOKE_DIR,
+        skip_tuning=True,
+    )
     report_path = Path(result["report_path"])
     assert report_path.exists()
     assert report_path.parent == REPORTS_SMOKE_DIR

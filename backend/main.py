@@ -1,8 +1,8 @@
 """FastAPI backend for the beauty recommendation system.
 
-Deployed as a Vercel Service. The root ``vercel.json`` rewrites ``/api/*`` to
-this service and everything else to the Next.js frontend, so both share one
-origin and no CORS configuration is required.
+Deployed as a Vercel Service with ``backend/`` as the service root and
+entrypoint ``main:app``. Imports are therefore relative to this directory
+(not the monorepo ``backend.*`` package path used by some local runners).
 """
 
 from __future__ import annotations
@@ -12,15 +12,25 @@ import sys
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any, cast
+
+# Vercel runs this file as /var/task/main.py (service root = backend/).
+# Local pytest may load it as backend.main; ensure sibling modules resolve.
+_BACKEND_ROOT = Path(__file__).resolve().parent
+if str(_BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_ROOT))
+_REPO_ROOT = _BACKEND_ROOT.parent
+if (_REPO_ROOT / "engine").is_dir() and str(_REPO_ROOT) not in sys.path:
+    sys.path.append(str(_REPO_ROOT))
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from backend.recommend_service import ArtifactsUnavailableError, recommend
-from backend.schemas import ErrorResponse, RecommendRequest, RecommendResponse, supported_values
 from engine.artifacts import get_artifacts
+from recommend_service import ArtifactsUnavailableError, recommend
+from schemas import ErrorResponse, RecommendRequest, RecommendResponse, supported_values
 
 BOOT_TIME = time.time()
 _ARTIFACTS_READY = False

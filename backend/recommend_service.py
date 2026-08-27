@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from backend.schemas import (
+from schemas import (
     ExplanationResponse,
     RecommendedProductResponse,
     RecommendRequest,

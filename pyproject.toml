@@ -22,6 +22,8 @@ explicit_package_bases = true
 [tool.ruff.lint.per-file-ignores]
 "src/audit/run_audit.py" = ["E501", "RUF001"]
 "tests/test_preprocessing.py" = ["E501"]
+"backend/main.py" = ["E402", "I001"]
+"backend/recommend_service.py" = ["I001"]
 
 [[tool.mypy.overrides]]
 module = ["pandas.*", "sklearn.*"]
