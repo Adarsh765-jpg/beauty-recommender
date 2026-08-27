@@ -5,13 +5,26 @@ from __future__ import annotations
 from typing import Any
 
 from engine.types import BeautyProfile
+from src.config import CATEGORY_ALIASES
+
+
+def _category_tokens(category: str) -> frozenset[str]:
+    normalized = category.strip().lower()
+    if not normalized:
+        return frozenset()
+    aliases = CATEGORY_ALIASES.get(normalized)
+    if aliases is not None:
+        return aliases
+    return frozenset({normalized})
 
 
 def _category_matches(product: dict[str, Any], category: str) -> bool:
-    normalized = category.strip().lower()
-    secondary = str(product.get("secondary_category") or "").lower()
-    tertiary = str(product.get("tertiary_category") or "").lower()
-    return normalized in {secondary, tertiary}
+    tokens = _category_tokens(category)
+    if not tokens:
+        return True
+    secondary = str(product.get("secondary_category") or "").strip().lower()
+    tertiary = str(product.get("tertiary_category") or "").strip().lower()
+    return secondary in tokens or tertiary in tokens
 
 
 def passes_constraints(product: dict[str, Any], profile: BeautyProfile) -> bool:

@@ -60,3 +60,37 @@ def test_impossible_budget_returns_empty_with_relaxation(artifacts: ArtifactBund
     assert result.candidate_count == 0
     assert result.items == []
     assert result.relaxations
+
+
+def test_results_respect_brand_diversity_cap(artifacts: ArtifactBundle) -> None:
+    profile = BeautyProfile(
+        skin_type="dry",
+        concerns=("hydration",),
+        budget_max_usd=9999.0,
+    )
+    result = rank_products(profile, artifacts, top_k=10)
+    assert len(result.items) > 0
+    brand_counts: dict[str, int] = {}
+    for item in result.items:
+        key = item.brand.strip().lower()
+        brand_counts[key] = brand_counts.get(key, 0) + 1
+    assert max(brand_counts.values()) <= 2
+
+
+def test_category_filter_keeps_hard_brand_cap(artifacts: ArtifactBundle) -> None:
+    profile = BeautyProfile(
+        skin_type="dry",
+        concerns=("hydration",),
+        budget_max_usd=9999.0,
+        category="Face Oils",
+    )
+    result = rank_products(profile, artifacts, top_k=10)
+    if not result.items:
+        pytest.skip("no face oil candidates")
+    brand_counts: dict[str, int] = {}
+    for item in result.items:
+        key = item.brand.strip().lower()
+        brand_counts[key] = brand_counts.get(key, 0) + 1
+    assert max(brand_counts.values()) <= 2
+    # Category filter skips the category frequency cap so top-k can fill.
+    assert len(result.items) == min(10, result.candidate_count)

@@ -4,6 +4,8 @@ Offline evaluation for the Beauty Recommender. All ranking gates use the **valid
 
 **Artifacts:** `reports/baseline_gate.json`, `reports/ablation_gate.json`, `reports/embedding_compare.json`, `reports/cohort_coverage.json`
 
+**Shipped mixing weights (matches `src/config.py`):** α=0.60, β=0.25, γ=0.15
+
 ---
 
 ## Protocol summary
@@ -33,12 +35,14 @@ Source: `reports/baseline_gate.json` (800 queries)
 | Rating-only | 0.00375 | |
 | Tuned content (grid) | 0.0125 | Slightly better; default weights kept for simplicity |
 
-**Category-restricted** setting (easier pool):
+**Category-restricted** setting (easier / more realistic shopping pool):
 
 | Method | hit_rate@10 |
 |---|---:|
-| Content | 0.1125 |
-| Popularity | 0.0125 |
+| Content | **0.1125** (~11.25%) |
+| Popularity | 0.0125 (~1.25%) |
+
+That is an ~**9×** lift over popularity in a category-filtered context — the number to read next to the unrestricted 1.125% headline.
 
 **Gate result:** `pass: true` — content beats popularity on unrestricted val.
 
@@ -58,28 +62,33 @@ Skin and concern signals are nearly independent; text overlaps moderately with s
 
 Source: `reports/ablation_gate.json` (800 queries, clean · unrestricted)
 
-| Configuration | hit_rate@10 | MRR | Δ hit_rate@10 vs full |
-|---|---:|---:|---:|
-| **Full** (content + cohort + quality) | **0.01125** | 0.00843 | — |
-| No cohort | 0.00500 | 0.00634 | **−0.00625** |
-| No content | 0.00125 | 0.00345 | **−0.01000** |
-| No quality | 0.01125 | 0.01181 | 0.000 |
+| Configuration | hit_rate@10 | Hits / 800 | MRR | Δ hit_rate@10 vs full |
+|---|---:|---:|---:|---:|
+| **Full** (content + cohort + quality) | **0.01125** | **9** | 0.00843 | — |
+| No cohort | 0.00500 | 4 | 0.00634 | −0.00625 |
+| No content | 0.00125 | 1 | 0.00345 | −0.01000 |
+| No quality | 0.01125 | 9 | 0.01181 | 0.000 |
+
+At ~1% hit rate and n=800, a ±0.6 pp swing is only a handful of queries. Binomial noise alone can move results by about that much, so small deltas should not be over-claimed.
 
 **Decisions**
 
 | Decision | Verdict | Evidence |
 |---|---|---|
-| Keep cohort prior | **Yes** | +0.62 pp hit_rate@10 vs no_cohort |
-| Keep content | **Yes** | Largest ablation drop when removed |
-| Keep quality | **Yes (tie on hit@10)** | Same hit_rate@10; used for ranking stability / explanations |
+| Keep cohort prior | **Directionally supports keeping** | +0.62 pp (9 vs 4 hits). Supportive, not definitive at this count. |
+| Keep content | **Yes** | Collapse to 1/800 when removed — large enough to trust |
+| Keep quality | **Yes (tie on hit@10)** | Same hit_rate@10; kept for ranking stability / explanations |
 
 ### Mixing-weight sweep (not applied)
 
-Current shipped weights: **α=0.60, β=0.25, γ=0.15**
+Shipped weights: **α=0.60, β=0.25, γ=0.15** (matches ablation/baseline runs above)
 
-Best on grid: **α=0.50, β=0.35, γ=0.15** → hit_rate@10 = **0.020** (vs 0.011 for current)
+| Setting | hit_rate@10 | MRR |
+|---|---:|---:|
+| **Shipped 0.60 / 0.25 / 0.15** | 0.01125 | 0.00843 |
+| Grid best 0.50 / 0.35 / 0.15 | **0.020** | 0.00580 |
 
-Current weights were **not** changed after the sweep to avoid chasing val noise late in the project; noted as a future improvement in the README.
+The grid-best mix was **not** shipped: with sparse hits, that gain can be validation noise, and changing weights late would desync the published ablation table from production. Documented as a future improvement instead.
 
 ---
 
@@ -144,5 +153,7 @@ python -m pytest tests/ -q
 ## Interpretation for evaluators
 
 1. **Success** is defined relative to strong baselines on a hard unrestricted pool, plus ablations that justify each scoring term.
-2. Absolute hit rates are modest because relevance is sparse in a 2k+ product catalog — category-restricted hit_rate@10 (~11%) shows the model is much stronger when the pool is realistic for shopping.
-3. Shipping choices (cohort on, TF-IDF not embeddings, weights frozen) prioritize **explainability, deployability, and reproducibility** over squeezing the last val points.
+2. Absolute unrestricted hit rates are modest because relevance is sparse in a 2k+ product catalog — **category-restricted hit_rate@10 ≈ 11.25% vs popularity 1.25% (~9×)** is the realistic shopping comparison.
+3. Shipping choices (cohort kept as a directional prior, TF-IDF not embeddings, weights frozen at 0.60/0.25/0.15) prioritize **explainability, deployability, and reproducibility** over squeezing the last sparse val points.
+4. Displayed top-k applies a hard brand diversity cap (and a category cap when not already category-filtered). Offline evaluation uses pure score order without display diversity, so UI grids can differ slightly from eval top-k lists.
+5. Category filtering in production uses shopper-friendly aliases (e.g. Cleansers → Face Wash & Cleansers); see `CATEGORY_ALIASES` in `src/config.py`.

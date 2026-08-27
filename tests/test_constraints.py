@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 
 from engine.artifacts import ArtifactBundle, load_artifacts
-from engine.constraints import filter_catalog, passes_constraints
+from engine.constraints import _category_matches, filter_catalog, passes_constraints
 from engine.ranking import rank_products
 from engine.types import BeautyProfile
 from src.config import DATA_ARTIFACTS
@@ -85,3 +85,41 @@ def test_out_of_stock_never_returned(artifacts: ArtifactBundle) -> None:
     )
     result = rank_products(profile, artifacts, top_k=50)
     assert out_of_stock["product_id"] not in {item.product_id for item in result.items}
+
+
+def test_cleansers_alias_includes_face_wash(artifacts: ArtifactBundle) -> None:
+    face_wash = next(
+        (
+            p
+            for p in artifacts.catalog
+            if str(p.get("tertiary_category") or "") == "Face Wash & Cleansers"
+            and not p.get("out_of_stock")
+            and float(p.get("price_usd") or 0) > 0
+        ),
+        None,
+    )
+    if face_wash is None:
+        pytest.skip("no in-stock face wash products in catalog")
+    profile = BeautyProfile(
+        skin_type="normal",
+        budget_max_usd=9999.0,
+        category="Cleansers",
+    )
+    assert _category_matches(face_wash, "Cleansers") is True
+    assert passes_constraints(face_wash, profile) is True
+
+
+def test_toners_alias_includes_mists(artifacts: ArtifactBundle) -> None:
+    mist = next(
+        (
+            p
+            for p in artifacts.catalog
+            if str(p.get("tertiary_category") or "") == "Mists & Essences"
+            and not p.get("out_of_stock")
+            and float(p.get("price_usd") or 0) > 0
+        ),
+        None,
+    )
+    if mist is None:
+        pytest.skip("no mists products in catalog")
+    assert _category_matches(mist, "Toners") is True

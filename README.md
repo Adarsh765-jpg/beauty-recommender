@@ -65,9 +65,9 @@ content = 0.34·skin_match + 0.34·concern_match + 0.32·text_similarity
 final = 0.60·content + 0.25·cohort + 0.15·quality
 ```
 
-Otherwise cohort is dropped and content + quality are used.
+Otherwise cohort is dropped and content + quality are used. A val weight sweep preferred 0.50/0.35/0.15 on hit_rate@10; that mix was **not** shipped (see [`docs/BENCHMARK.md`](docs/BENCHMARK.md)) to avoid chasing sparse validation noise.
 
-Explanations only emit claims that pass evidence gates (e.g. skin type in `suited_skin_types`, concern overlap, cohort threshold, review quality).
+Explanations only emit claims that pass evidence gates (e.g. skin type in `suited_skin_types`, concern overlap, cohort threshold, review quality). Displayed top-k applies a **hard brand cap** (max 2) and a category cap when browsing all categories; category-capped pools may relax category frequency only to fill top-k. Offline eval ranks without display diversity so hit-rate metrics reflect pure score order.
 
 ---
 
@@ -131,7 +131,15 @@ Interactive docs: http://127.0.0.1:8000/api/docs
 
 ## Evaluation
 
-Offline gates live under `reports/`. Human-readable summary: [`docs/BENCHMARK.md`](docs/BENCHMARK.md).
+Offline gates live under `reports/`. Full write-up: [`docs/BENCHMARK.md`](docs/BENCHMARK.md).
+
+| Setting | hit_rate@10 | Context |
+|---|---:|---|
+| Content · unrestricted (headline gate) | **0.01125** | Hard pool (~2.3k candidates); sparse labels |
+| Content · **category-restricted** | **0.1125** | Realistic shopping pool |
+| Popularity · category-restricted | 0.0125 | Same pool baseline |
+
+In a realistic category-filtered shopping context, content is ~**9×** popularity (11.25% vs 1.25% hit_rate@10). The unrestricted 1.125% figure is the hard-gate number — low in absolute terms because relevance is sparse across the full catalog, not because the ranker fails relative to baselines (popularity/random are ~0 there).
 
 | Report | Purpose |
 |---|---|
@@ -140,7 +148,7 @@ Offline gates live under `reports/`. Human-readable summary: [`docs/BENCHMARK.md
 | `embedding_compare.json` | TF-IDF vs sentence-transformers cost/quality |
 | `cohort_coverage.json` | Fraction of skin-type pairs with enough reviews |
 
-**Headline decisions:** content beats popularity (gate pass); keep cohort prior (+0.62 pp hit_rate@10); ship TF-IDF over embeddings for size/cold-start.
+**Headline decisions:** content beats popularity (gate pass); cohort prior **directionally** helps (+0.62 pp hit_rate@10, but only ~9 vs 4 hits at n=800 — supportive, not definitive); ship TF-IDF over embeddings for size/cold-start; keep mixing weights at 0.60/0.25/0.15 rather than the noisier grid-best 0.50/0.35/0.15.
 
 Run tests:
 
@@ -173,7 +181,7 @@ See [`docs/TEST_CASES.md`](docs/TEST_CASES.md) for successful and failure scenar
 - No product images in the dataset (placeholders in UI)
 - Cohort coverage is uneven for rare skin-type × product cells (~18.6% of pairs meet the review minimum)
 - Ingredient exclusion rules are keyword-based, not dermatologist-validated
-- Category filter is exact secondary/tertiary match
+- Category filter uses shopper-friendly aliases (e.g. Cleansers → Face Wash & Cleansers; Toners → Mists & Essences)
 - `filtered_count` in the API = products **rejected** by filters; `candidate_count` = eligible
 - Absolute unrestricted hit rates are low; see [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for interpretation
 
@@ -182,9 +190,10 @@ See [`docs/TEST_CASES.md`](docs/TEST_CASES.md) for successful and failure scenar
 ## Future improvements
 
 - Offline image enrichment (Sephora SKU → self-hosted assets)
-- Tuned mixing weights from val sweep (0.50/0.35/0.15 looked stronger offline)
+- Tuned mixing weights from val sweep (0.50/0.35/0.15 looked stronger offline; not shipped)
 - Routine builder (cleanser → treatment → moisturizer)
-- A/B explanation formats and diversity constraints
+- A/B explanation formats and calibrated match percentages
+- Precomputed embeddings as an optional offline artifact
 
 ---
 

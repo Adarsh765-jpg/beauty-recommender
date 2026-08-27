@@ -193,7 +193,7 @@
   },
   "gate": {
     "cohort_keeps": true,
-    "cohort_verdict": "Cohort prior kept: full model matches or beats no_cohort on validation (delta hit_rate@10 +0.0062, delta mrr +0.0021)",
+    "cohort_verdict": "Cohort prior kept: directionally supports keeping cohort (full 9/800 hits vs no_cohort 4/800; delta hit_rate@10 +0.0062). Absolute counts are small — treat as supportive, not definitive. no_content collapse (1/800) is the stronger ablation signal.",
     "ship_tfidf": true,
     "tfidf_beats_embeddings": false,
     "embedding_verdict": "Embeddings beat TF-IDF offline (delta hit_rate@10 +0.0075) but TF-IDF remains shipped for artifact size and cold-start constraints",

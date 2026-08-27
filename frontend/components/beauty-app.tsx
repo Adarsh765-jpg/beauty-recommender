@@ -37,6 +37,15 @@ const INITIAL_FORM: BeautyProfileForm = {
   category: null,
 };
 
+const BUDGET_STEPS = [30, 50, 75, 100, 150, 9999] as const;
+
+function nextBudget(current: number): number {
+  for (const step of BUDGET_STEPS) {
+    if (step > current) return step;
+  }
+  return 9999;
+}
+
 export function BeautyApp() {
   const [phase, setPhase] = useState<AppPhase>("landing");
   const [step, setStep] = useState(0);
@@ -73,8 +82,12 @@ export function BeautyApp() {
     return true;
   }
 
-  async function submitProfile() {
-    if (!form.skinType) return;
+  async function submitProfile(override?: BeautyProfileForm) {
+    const active = override ?? form;
+    if (!active.skinType) return;
+    if (override) {
+      setForm(override);
+    }
 
     setPhase("loading");
     setError(null);
@@ -83,11 +96,11 @@ export function BeautyApp() {
 
     try {
       const response = await fetchRecommendations({
-        skin_type: form.skinType,
-        concerns: form.concerns,
-        exclusions: form.exclusions,
-        budget_max_usd: form.budgetMaxUsd,
-        category: form.category,
+        skin_type: active.skinType,
+        concerns: active.concerns,
+        exclusions: active.exclusions,
+        budget_max_usd: active.budgetMaxUsd,
+        category: active.category,
         top_k: 10,
       });
       setResults(response);
@@ -108,6 +121,18 @@ export function BeautyApp() {
     setResults(null);
     setSelectedId(null);
     setError(null);
+  }
+
+  function raiseBudget() {
+    void submitProfile({ ...form, budgetMaxUsd: nextBudget(form.budgetMaxUsd) });
+  }
+
+  function clearExclusions() {
+    void submitProfile({ ...form, exclusions: [] });
+  }
+
+  function clearCategory() {
+    void submitProfile({ ...form, category: null });
   }
 
   return (
@@ -303,7 +328,7 @@ export function BeautyApp() {
               ) : (
                 <button
                   type="button"
-                  onClick={submitProfile}
+                  onClick={() => void submitProfile()}
                   disabled={!canAdvance()}
                   className="btn-primary py-2.5"
                 >
@@ -335,6 +360,9 @@ export function BeautyApp() {
             setStep(4);
             setError(null);
           }}
+          onRaiseBudget={raiseBudget}
+          onClearExclusions={clearExclusions}
+          onClearCategory={clearCategory}
         />
       )}
     </div>
@@ -401,6 +429,9 @@ function ResultsView({
   onSelect,
   onRestart,
   onEditProfile,
+  onRaiseBudget,
+  onClearExclusions,
+  onClearCategory,
 }: {
   form: BeautyProfileForm;
   results: RecommendResponse | null;
@@ -409,13 +440,16 @@ function ResultsView({
   onSelect: (product: RecommendedProduct) => void;
   onRestart: () => void;
   onEditProfile: () => void;
+  onRaiseBudget: () => void;
+  onClearExclusions: () => void;
+  onClearCategory: () => void;
 }) {
   if (error) {
     return (
       <main className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
         <h2 className="text-xl font-bold text-foreground">Couldn&apos;t load recommendations</h2>
         <p className="mt-2 text-sm text-body">{error}</p>
-        <div className="mt-6 flex justify-center gap-3">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button type="button" onClick={onEditProfile} className="btn-primary py-2.5">
             Edit profile
           </button>
@@ -428,21 +462,32 @@ function ResultsView({
   }
 
   if (!results || results.status === "no_match" || results.items.length === 0) {
+    const raisedBudget = nextBudget(form.budgetMaxUsd);
     return (
       <main className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
         <h2 className="text-xl font-bold text-foreground">No products matched</h2>
-        <p className="mt-2 text-sm text-body">Try relaxing your budget or filters.</p>
-        {results?.relaxations.length ? (
-          <ul className="mt-4 space-y-2 text-left text-sm text-body">
-            {results.relaxations.map((item) => (
-              <li key={item} className="rounded-sm border border-border bg-surface px-4 py-3">
-                {item}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <div className="mt-6 flex justify-center gap-3">
-          <button type="button" onClick={onEditProfile} className="btn-primary py-2.5">
+        <p className="mt-2 text-sm text-body">
+          Your filters may be too strict. Try one of these quick fixes:
+        </p>
+        <div className="mt-6 flex flex-col gap-2">
+          {form.budgetMaxUsd < 9999 ? (
+            <button type="button" onClick={onRaiseBudget} className="btn-primary w-full py-2.5">
+              Raise budget to {formatPrice(raisedBudget)}
+            </button>
+          ) : null}
+          {form.exclusions.length > 0 ? (
+            <button type="button" onClick={onClearExclusions} className="btn-secondary w-full py-2.5">
+              Clear ingredient exclusions
+            </button>
+          ) : null}
+          {form.category ? (
+            <button type="button" onClick={onClearCategory} className="btn-secondary w-full py-2.5">
+              Search all categories
+            </button>
+          ) : null}
+        </div>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <button type="button" onClick={onEditProfile} className="btn-secondary py-2.5">
             Adjust filters
           </button>
           <button type="button" onClick={onRestart} className="btn-secondary py-2.5">

@@ -62,6 +62,11 @@ def run_ablation_gate(
     no_cohort = ablations["ablations"]["no_cohort"]["metrics"]
     cohort_delta_hr = ablations["comparison"]["full_vs_no_cohort"]["delta_hit_rate@10"]
     cohort_delta_mrr = ablations["comparison"]["full_vs_no_cohort"]["delta_mrr"]
+    n_queries = int(ablations.get("queries") or 0)
+    full_hits = int(round(float(full["hit_rate@10"]) * n_queries)) if n_queries else None
+    no_cohort_hits = (
+        int(round(float(no_cohort["hit_rate@10"]) * n_queries)) if n_queries else None
+    )
 
     cohort_keeps = cohort_delta_hr >= 0.0 or cohort_delta_mrr >= 0.0
 
@@ -88,9 +93,14 @@ def run_ablation_gate(
             )
 
     if cohort_keeps:
+        hit_note = ""
+        if full_hits is not None and no_cohort_hits is not None and n_queries:
+            hit_note = f" ({full_hits}/{n_queries} hits vs {no_cohort_hits}/{n_queries})"
         cohort_verdict = (
-            "Cohort prior kept: full model matches or beats no_cohort on validation "
-            f"(delta hit_rate@10 {cohort_delta_hr:+.4f}, delta mrr {cohort_delta_mrr:+.4f})"
+            "Cohort prior kept: directionally supports keeping cohort"
+            f"{hit_note}; delta hit_rate@10 {cohort_delta_hr:+.4f}, "
+            f"delta mrr {cohort_delta_mrr:+.4f}. Absolute counts are small at ~1% hit "
+            "rate — treat as supportive, not definitive."
         )
     else:
         cohort_verdict = (

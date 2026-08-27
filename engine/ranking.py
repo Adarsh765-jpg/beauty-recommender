@@ -23,7 +23,14 @@ from engine.types import (
     RankingResult,
     ScoreBreakdown,
 )
-from src.config import ALPHA, BETA, COHORT_MIN_REVIEWS, GAMMA
+from src.config import (
+    ALPHA,
+    BETA,
+    COHORT_MIN_REVIEWS,
+    GAMMA,
+    MAX_RESULTS_PER_BRAND,
+    MAX_RESULTS_PER_CATEGORY,
+)
 
 
 def default_ranking_config() -> RankingConfig:
@@ -191,7 +198,15 @@ def rank_products(
             relaxations=relaxations,
         )
 
-    items = [row[1] for row in ranked_rows[:top_k]]
+    # When the shopper already filtered to one category, do not also cap
+    # category frequency — brand diversity is still enforced hard.
+    items = _diversify_top_k(
+        ranked_rows,
+        top_k=top_k,
+        max_per_brand=MAX_RESULTS_PER_BRAND,
+        max_per_category=MAX_RESULTS_PER_CATEGORY,
+        enforce_category_cap=not bool(profile.category),
+    )
     return RankingResult(
         items=items,
         candidate_count=len(eligible_indices),
@@ -200,14 +215,67 @@ def rank_products(
     )
 
 
+def _diversify_top_k(
+    ranked_rows: list[tuple[float, RankedProduct]],
+    *,
+    top_k: int,
+    max_per_brand: int,
+    max_per_category: int,
+    enforce_category_cap: bool = True,
+) -> list[RankedProduct]:
+    """Greedy diversity with a hard brand cap.
+
+    Category caps apply on the first pass when ``enforce_category_cap`` is True.
+    If top-k is not full, a second pass may relax the category cap only —
+    brand caps are never exceeded.
+    """
+    selected: list[RankedProduct] = []
+    brand_counts: dict[str, int] = {}
+    category_counts: dict[str, int] = {}
+
+    def _try_add(item: RankedProduct, *, use_category_cap: bool) -> bool:
+        brand_key = item.brand.strip().lower()
+        category_key = (item.tertiary_category or item.secondary_category).strip().lower()
+        if brand_counts.get(brand_key, 0) >= max_per_brand:
+            return False
+        if (
+            use_category_cap
+            and category_key
+            and category_counts.get(category_key, 0) >= max_per_category
+        ):
+            return False
+        selected.append(item)
+        brand_counts[brand_key] = brand_counts.get(brand_key, 0) + 1
+        if category_key:
+            category_counts[category_key] = category_counts.get(category_key, 0) + 1
+        return True
+
+    for _, item in ranked_rows:
+        if len(selected) >= top_k:
+            break
+        _try_add(item, use_category_cap=enforce_category_cap)
+
+    if len(selected) < top_k and enforce_category_cap:
+        selected_ids = {item.product_id for item in selected}
+        for _, item in ranked_rows:
+            if len(selected) >= top_k:
+                break
+            if item.product_id in selected_ids:
+                continue
+            if _try_add(item, use_category_cap=False):
+                selected_ids.add(item.product_id)
+
+    return selected
+
+
 def _suggest_relaxations(profile: BeautyProfile) -> list[str]:
     suggestions: list[str] = []
     if profile.budget_max_usd < 9999:
-        suggestions.append("Increase your budget ceiling.")
+        suggestions.append("Raise your budget.")
     if profile.exclusions:
-        suggestions.append("Relax one or more ingredient exclusions.")
+        suggestions.append("Clear ingredient exclusions.")
     if profile.category:
-        suggestions.append("Try a broader category filter.")
+        suggestions.append("Search all categories.")
     if not suggestions:
         suggestions.append("No products match the current profile.")
     return suggestions

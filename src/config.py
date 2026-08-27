@@ -103,10 +103,36 @@ W_SKIN = 0.34
 W_CONCERN = 0.34
 W_TEXT = 0.32
 
-# Final-score mixing weights (cohort prior added in Phase 7).
+# Final-score mixing weights (validated on val; Phase 8).
+# Grid best was α=0.50, β=0.35, γ=0.15 (hit_rate@10 0.020 vs 0.011 here).
+# Kept the conservative 0.60/0.25/0.15 mix to avoid chasing sparse val noise.
 ALPHA = 0.60
 BETA = 0.25
 GAMMA = 0.15
+
+# Diversity caps when selecting the displayed top-k from the ranked pool.
+MAX_RESULTS_PER_BRAND = 2
+MAX_RESULTS_PER_CATEGORY = 3
+
+# UI category labels → catalog secondary/tertiary names (lowercase).
+CATEGORY_ALIASES: dict[str, frozenset[str]] = {
+    "moisturizers": frozenset({"moisturizers"}),
+    "face serums": frozenset({"face serums"}),
+    "cleansers": frozenset({"cleansers", "face wash & cleansers"}),
+    "toners": frozenset({"toners", "mists & essences"}),
+    "sunscreen": frozenset({"sunscreen", "face sunscreen"}),
+    "eye creams & treatments": frozenset({"eye creams & treatments", "eye care"}),
+    "face masks": frozenset({"face masks", "masks"}),
+    "face oils": frozenset({"face oils"}),
+    "treatments": frozenset(
+        {
+            "treatments",
+            "facial peels",
+            "exfoliators",
+            "blemish & acne treatments",
+        }
+    ),
+}
 
 # Bayesian shrinkage for quality_score: pull sparse ratings toward catalog mean.
 QUALITY_PRIOR_REVIEWS = 50
