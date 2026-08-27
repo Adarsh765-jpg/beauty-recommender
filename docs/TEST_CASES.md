@@ -1,6 +1,9 @@
 # Test cases
 
-Representative scenarios for evaluators. Automated coverage: `tests/` (pytest).
+**How to use this page:** pick a scenario, try it on the live site or API, and check the “Expected” list.
+
+- **Automated** (run in `tests/` / CI): S1–S3, S5, F1  
+- **Manual** (click through the UI): S4, F2–F5  
 
 ## Successful scenarios
 

@@ -1,215 +1,154 @@
 # Beauty Recommender
 
-Explainable, personalized skincare recommendations on the Sephora product catalog.
+A skincare quiz that recommends Sephora products and shows **why** each pick fits.
 
-**Live:** https://beauty-recommender.vercel.app  
-**Repo:** https://github.com/Adarsh765-jpg/beauty-recommender
+**Try it:** https://beauty-recommender.vercel.app  
+**Code:** https://github.com/Adarsh765-jpg/beauty-recommender
 
----
+### Try it live
+1. Open the live link (first load may take a moment on Vercel)  
+2. Click **Quick Demo** (or pick Dry + Hydration, budget $80)  
+3. Tap a product and read **Why this pick**
 
-## Problem & motivation
-
-Beauty shoppers face a huge catalog and vague “best for you” claims. This system ranks Sephora skincare for a skin profile and shows **evidence-backed reasons** for each pick — not a black box.
-
-Inspired by Nykaa/Sephora quiz flows, with an emphasis on **explainability** over opaque collaborative filtering.
-
----
-
-## What it does
-
-1. Collect skin type, concerns, ingredient exclusions, budget, and category
-2. Hard-filter the catalog (stock, price, category, exclusions)
-3. Rank with a hybrid score: content fit + skin-type cohort prior + review quality
-4. Attach gated explanations (only claims backed by evidence)
-5. Serve results through a FastAPI API and a Next.js quiz UI
+More detail (optional): [How it works](docs/ARCHITECTURE.md) · [API](docs/API.md) · [Numbers](docs/BENCHMARK.md) · [Test scenarios](docs/TEST_CASES.md)
 
 ---
 
-## Architecture
+## What problem does this solve?
 
-```
-Browser (Next.js)
-    │  POST /api/recommend
-    ▼
-Vercel rewrite ──► FastAPI (backend/)
-                       │
-                       ▼
-              engine/ ranking + explain
-                       │
-                       ▼
-         data/artifacts (TF-IDF, catalog, cohort meta)
+Shopping for skincare is hard: huge catalogs, vague “best for you” claims, and no purchase history on a first visit.
+
+This app asks a short quiz (skin type, concerns, budget, exclusions) and returns ranked products with clear reasons — not a black box.
+
+---
+
+## How it works (simple version)
+
+```text
+Quiz answers → drop products that break rules (budget, stock, ingredients)
+            → score what’s left (fit + similar shoppers + reviews)
+            → show top results with short explanations
 ```
 
-| Layer | Role |
+Three score pieces (when available):
+
+| Piece | In plain English |
 |---|---|
-| `frontend/` | Quiz UI, product cards, Why-this panel |
-| `backend/` | FastAPI `/api/health`, `/api/schema`, `/api/recommend` |
-| `engine/` | Constraints, TF-IDF content ranker, cohort, quality, explanations |
-| `src/` | Offline data audit, preprocessing, features, evaluation gates |
-| `data/artifacts/` | Precomputed catalog + TF-IDF (no pandas at request time) |
-| `scripts/prepare_backend.py` | Copies `engine/`, `src/config.py`, artifacts into `backend/` for Vercel |
+| **Content** | Does it match your skin and concerns? (also text similarity) |
+| **Cohort** | Do people with the same skin type tend to like it? |
+| **Quality** | Is it well reviewed? (careful with tiny review counts) |
 
----
+Final mix we ship: **60% content · 25% cohort · 15% quality**.  
+Cohort only applies when there is enough same-skin-type evidence (see Limits). Other weight mixes: [BENCHMARK](docs/BENCHMARK.md). Diagrams: [ARCHITECTURE](docs/ARCHITECTURE.md).
 
-## Recommendation methodology
-
-**Content score**
-
-```
-content = 0.34·skin_match + 0.34·concern_match + 0.32·text_similarity
-```
-
-**Final score** (when cohort signal is available)
-
-```
-final = 0.60·content + 0.25·cohort + 0.15·quality
-```
-
-Otherwise cohort is dropped and content + quality are used. A val weight sweep preferred 0.50/0.35/0.15 on hit_rate@10; that mix was **not** shipped (see [`docs/BENCHMARK.md`](docs/BENCHMARK.md)) to avoid chasing sparse validation noise.
-
-Explanations only emit claims that pass evidence gates (e.g. skin type in `suited_skin_types`, concern overlap, cohort threshold, review quality). Displayed top-k applies a **hard brand cap** (max 2) and a category cap when browsing all categories; category-capped pools may relax category frequency only to fill top-k. Offline eval ranks without display diversity so hit-rate metrics reflect pure score order.
+Rules like “no fragrance” or “under $80” are **hard stops** — they never get weakly scored away.
 
 ---
 
 ## Dataset
 
-- Source: [Sephora Products and Skincare Reviews](https://www.kaggle.com/datasets/nadyinky/sephora-products-and-skincare-reviews) (via [nadyinky/sephora-analysis](https://github.com/nadyinky/sephora-analysis))
-- Runtime catalog: **2,420** skincare products in `data/artifacts/catalog.json`
-- Samples under `data/sample/` for smoke/offline checks
-- **No product image URLs** in the source CSV — UI uses placeholders (see Limitations)
+Public Sephora skincare data ([Kaggle](https://www.kaggle.com/datasets/nadyinky/sephora-products-and-skincare-reviews) / [GitHub](https://github.com/nadyinky/sephora-analysis)):
+
+- **2,420** skincare products in the live catalog  
+- Reviews used offline to learn “people with dry skin liked X” signals and to measure quality  
+- Small samples in `data/sample/` so a fresh clone can smoke-test  
 
 ---
 
-## Tech stack
+## Built with
 
-- **Frontend:** Next.js 16, React 19, Tailwind CSS 4
-- **Backend:** FastAPI, NumPy
-- **Offline ML:** pandas / scikit-learn style TF-IDF pipeline in `src/` + `engine/tfidf.py`
-- **Deploy:** Vercel Services (`vercel.json` frontend + backend)
-- **Tests:** pytest, mypy, ruff
+- **UI:** Next.js + React + Tailwind  
+- **API:** FastAPI  
+- **Scoring:** NumPy + precomputed files (TF-IDF text match)  
+- **Host:** Vercel  
+- **Checks:** pytest, mypy, ruff, GitHub Actions  
 
 ---
 
-## Local setup
+## Why we built it this way
 
-### Prerequisites
+| Choice | Why |
+|---|---|
+| Quiz profile, not “users like you” graphs | Works for first-time visitors |
+| Strict filters | Budget / allergy-style exclusions must be trustworthy |
+| Precomputed catalog files | Keeps the live site fast and cheap to host |
+| Explanations need evidence | We only claim things we can back up |
+| TF-IDF in production | Smaller and simpler than heavy embedding models |
 
-- Python 3.12+
-- Node.js 20+
+---
 
-### Backend
+## Does it work? (evaluation snapshot)
+
+Full write-up: [BENCHMARK](docs/BENCHMARK.md).
+
+| Situation | hit_rate@10 | Meaning |
+|---|---:|---|
+| Whole catalog | 1.1% | Hard test — many products, few “right” answers |
+| Same category (more realistic) | **11.3%** | About **9×** better than “just pick popular” (1.3%) |
+
+Takeaway: the system beats simple popularity when shopping inside a category. Absolute % on the full catalog looks small because the search space is large — that’s expected.
 
 ```bash
+python -m pytest tests/ -q
+```
+
+---
+
+## Test scenarios
+
+Full list: [TEST_CASES](docs/TEST_CASES.md).
+
+- **Automated in CI:** happy path, exclusions, category filter, validation errors, tiny budget  
+- **Manual in the UI:** Why panel, placeholders, thin profiles, outdated product names  
+
+| | What to try | What you should see |
+|---|---|---|
+| Happy path | Dry + hydration, $80 | Ranked list + reasons |
+| Exclusion | Skip fragrance | No fragrance products |
+| Stuck search | Budget $1 | “No match” + tips to relax filters |
+
+---
+
+## Limits & what’s next
+
+**Honest limits today**
+
+- No real product photos in the dataset → UI uses simple placeholders (exact-ID image enrichment is planned next)  
+- “Similar shoppers” (cohort) only fires when a product has **≥ 5** reviews from that skin type — about **18.6%** of skin-type × product pairs qualify; the rest fall back to fit + reviews  
+- Ingredient exclusions are keyword-based (not medical advice)  
+- Catalog is a snapshot (prices/stock may change on Sephora.com)  
+
+**Later ideas:** product images, routine builder (cleanser → serum → moisturizer), richer ranking with more data.
+
+---
+
+## Run locally
+
+Need Python 3.12+ and Node 20+.
+
+```bash
+# Terminal 1 — API
 pip install -r requirements-dev.txt
 pip install -r backend/requirements.txt
 python scripts/prepare_backend.py
 python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-```
 
-### Frontend
-
-```bash
+# Terminal 2 — website
 cd frontend
 npm install
 npx next dev -p 3000
 ```
 
-Open http://localhost:3000 — the Next config proxies `/api/*` to port 8000 locally.
+Open http://localhost:3000  
 
-### API smoke
-
-```bash
-curl http://127.0.0.1:8000/api/health
-curl -X POST http://127.0.0.1:8000/api/recommend ^
-  -H "Content-Type: application/json" ^
-  -d "{\"skin_type\":\"dry\",\"concerns\":[\"hydration\"],\"budget_max_usd\":80,\"top_k\":5}"
-```
-
-Interactive docs: http://127.0.0.1:8000/api/docs
+Curl / field reference: [API.md](docs/API.md) (includes `health` + `recommend` examples).
 
 ---
 
-## Evaluation
+## Where this sits vs retail beauty apps
 
-Offline gates live under `reports/`. Full write-up: [`docs/BENCHMARK.md`](docs/BENCHMARK.md).
-
-| Setting | hit_rate@10 | Context |
-|---|---:|---|
-| Content · unrestricted (headline gate) | **0.01125** | Hard pool (~2.3k candidates); sparse labels |
-| Content · **category-restricted** | **0.1125** | Realistic shopping pool |
-| Popularity · category-restricted | 0.0125 | Same pool baseline |
-
-In a realistic category-filtered shopping context, content is ~**9×** popularity (11.25% vs 1.25% hit_rate@10). The unrestricted 1.125% figure is the hard-gate number — low in absolute terms because relevance is sparse across the full catalog, not because the ranker fails relative to baselines (popularity/random are ~0 there).
-
-| Report | Purpose |
-|---|---|
-| `baseline_gate.json` | Content vs popularity / random / rating on val |
-| `ablation_gate.json` | Ablate content / cohort / quality; weight sweep |
-| `embedding_compare.json` | TF-IDF vs sentence-transformers cost/quality |
-| `cohort_coverage.json` | Fraction of skin-type pairs with enough reviews |
-
-**Headline decisions:** content beats popularity (gate pass); cohort prior **directionally** helps (+0.62 pp hit_rate@10, but only ~9 vs 4 hits at n=800 — supportive, not definitive); ship TF-IDF over embeddings for size/cold-start; keep mixing weights at 0.60/0.25/0.15 rather than the noisier grid-best 0.50/0.35/0.15.
-
-Run tests:
-
-```bash
-python -m pytest tests/ -q
-python -m mypy backend engine src tests
-python -m ruff check .
-```
+Same basic path as Nykaa/Sephora quizzes (questions → product grid). What’s different here is the **transparent scoring and evidence-backed “why”** on a fixed offline catalog — not live inventory, photos, or purchase-history personalization. Natural next steps are images and routines.
 
 ---
 
-## Test cases
-
-See [`docs/TEST_CASES.md`](docs/TEST_CASES.md) for successful and failure scenarios.
-
----
-
-## Assumptions & design decisions
-
-- Cold-start / profile-based ranking (no user history graph)
-- Hard filters never become soft score penalties
-- Precompute artifacts so request path stays lightweight on Vercel
-- Evidence-gated explanations over unrestricted LLM copy
-- Typographic / placeholder product visuals until images are enriched
-
----
-
-## Known limitations
-
-- No product images in the dataset (placeholders in UI)
-- Cohort coverage is uneven for rare skin-type × product cells (~18.6% of pairs meet the review minimum)
-- Ingredient exclusion rules are keyword-based, not dermatologist-validated
-- Category filter uses shopper-friendly aliases (e.g. Cleansers → Face Wash & Cleansers; Toners → Mists & Essences)
-- `filtered_count` in the API = products **rejected** by filters; `candidate_count` = eligible
-- Absolute unrestricted hit rates are low; see [`docs/BENCHMARK.md`](docs/BENCHMARK.md) for interpretation
-
----
-
-## Future improvements
-
-- Offline image enrichment (Sephora SKU → self-hosted assets)
-- Tuned mixing weights from val sweep (0.50/0.35/0.15 looked stronger offline; not shipped)
-- Routine builder (cleanser → treatment → moisturizer)
-- A/B explanation formats and calibrated match percentages
-- Precomputed embeddings as an optional offline artifact
-
----
-
-## Bonus: Nykaa-inspired comparison
-
-| | Nykaa / Sephora | This system |
-|---|---|---|
-| **Similar** | Skin quiz, filter chips, product grid, ratings/price | Same interaction pattern |
-| **Different** | Purchase graph, personalization at scale, real images | Hybrid content+cohort+quality with explicit score breakdown |
-| **Limitation** | — | No images, no live inventory, smaller offline catalog slice |
-| **Next** | — | Images, routines, learned ranking, richer exclusions |
-
----
-
-## Deploy notes
-
-1. Ensure `data/artifacts/` is committed (catalog, tfidf, meta, vocabulary, idf)
-2. `vercel.json` runs `python ../scripts/prepare_backend.py` on backend install
-3. Do **not** rely on Next.js rewriting `/api` to localhost in production (`VERCEL` env skips that rewrite)
+Data © brands / Sephora; dataset from nadyinky’s public release. Independent demo — not affiliated with Sephora, Nykaa, or Orbo beyond the assignment.

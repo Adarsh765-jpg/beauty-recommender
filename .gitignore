@@ -20,9 +20,10 @@ out/
 # production
 /build
 
-# misc
-.DS_Store
-*.pem
+# Agent / IDE noise (Next may regenerate AGENTS.md on `next dev`)
+AGENTS.md
+CLAUDE.md
+.cursor/
 
 # debug
 npm-debug.log*

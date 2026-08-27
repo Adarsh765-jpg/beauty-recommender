@@ -1,14 +1,23 @@
 # Benchmark & evaluation report
 
-Offline evaluation for the Beauty Recommender. All ranking gates use the **validation** split only; the held-out test split was not used for model decisions.
+**In one sentence:** we checked whether our ranking beats simple baselines (popularity, random, rating-only) on held-out reviews — and whether each score piece is worth keeping.
 
-**Artifacts:** `reports/baseline_gate.json`, `reports/ablation_gate.json`, `reports/embedding_compare.json`, `reports/cohort_coverage.json`
+All decisions below used the **validation** split only (test set stayed unused for choosing the model).
 
-**Shipped mixing weights (matches `src/config.py`):** α=0.60, β=0.25, γ=0.15
+**Where the numbers live:** `reports/baseline_gate.json`, `reports/ablation_gate.json`, `reports/embedding_compare.json`, `reports/cohort_coverage.json`
+
+**Weights we ship:** 60% content · 25% cohort · 15% quality (`src/config.py`)
 
 ---
 
 ## Protocol summary
+
+**How to read the tables**
+
+- **hit_rate@10** = “Was the right product somewhere in the top 10?”  
+- **Unrestricted** = search almost the whole skincare catalog (harder).  
+- **Category-restricted** = shopper already picked a category (more like real browsing).  
+- Low unrestricted % does **not** mean the app is broken — it means the needle is small in a big haystack. Compare to popularity/random in the same setting.
 
 | Setting | Value |
 |---|---|
