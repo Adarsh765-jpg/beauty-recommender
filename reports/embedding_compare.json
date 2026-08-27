@@ -1,0 +1,37 @@
+{
+  "split": "val",
+  "variant_key": "clean__unrestricted",
+  "queries": 400,
+  "skipped": false,
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "deployment_cost": {
+    "tfidf_artifact_bytes": {
+      "catalog.json": 5267125,
+      "vocabulary.json": 37019,
+      "idf.npy": 7972,
+      "tfidf.npz": 388798,
+      "meta.json": 430836,
+      "total_bytes": 6131750
+    },
+    "embedding_model_cache_bytes_estimate": 91578455,
+    "cold_start_import_seconds": 3.508,
+    "offline_catalog_encode_seconds": 6.531,
+    "note": "Embeddings are offline-only. Shipped runtime uses TF-IDF artifacts (6,131,750 bytes total)."
+  },
+  "tfidf": {
+    "hit_rate@10": 0.0075,
+    "mrr": 0.006251327037538284
+  },
+  "sentence_transformer": {
+    "hit_rate@10": 0.015,
+    "mrr": 0.006197869184463866
+  },
+  "delta": {
+    "hit_rate@10": 0.0075,
+    "mrr": -5.345785307441821e-05
+  },
+  "reports": {
+    "tfidf": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare_tfidf_val.json",
+    "sentence_transformer": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare_st_val.json"
+  }
+}

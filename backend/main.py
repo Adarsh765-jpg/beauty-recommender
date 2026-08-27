@@ -10,23 +10,72 @@ from __future__ import annotations
 import os
 import sys
 import time
-from typing import Any
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from typing import Any, cast
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from backend.recommend_service import ArtifactsUnavailableError, recommend
+from backend.schemas import ErrorResponse, RecommendRequest, RecommendResponse, supported_values
+from engine.artifacts import get_artifacts
+
 BOOT_TIME = time.time()
+_ARTIFACTS_READY = False
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    global _ARTIFACTS_READY
+    try:
+        get_artifacts()
+        _ARTIFACTS_READY = True
+    except FileNotFoundError:
+        _ARTIFACTS_READY = False
+    yield
+
 
 app = FastAPI(
     title="Beauty Recommender API",
     version="0.1.0",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
+    lifespan=lifespan,
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(
+    _: Request,
+    exc: RequestValidationError,
+) -> JSONResponse:
+    errors = [
+        {
+            "field": ".".join(str(part) for part in error.get("loc", ()) if part != "body"),
+            "message": error.get("msg", "invalid value"),
+            "type": error.get("type", "value_error"),
+        }
+        for error in exc.errors()
+    ]
+    payload = ErrorResponse(
+        error="validation_error",
+        detail=cast(list[object], errors),
+    )
+    return JSONResponse(status_code=422, content=payload.model_dump())
 
 
 @app.get("/api/health")
 def health(request: Request) -> dict[str, Any]:
+    artifacts_ready = _ARTIFACTS_READY
+    if not artifacts_ready:
+        try:
+            get_artifacts()
+            artifacts_ready = True
+        except FileNotFoundError:
+            artifacts_ready = False
+
     return {
         "status": "ok",
         "service": "beauty-recommender",
@@ -35,22 +84,37 @@ def health(request: Request) -> dict[str, Any]:
         "region": os.environ.get("VERCEL_REGION", "local"),
         "received_path": request.url.path,
         "uptime_seconds": round(time.time() - BOOT_TIME, 3),
+        "artifacts_ready": artifacts_ready,
     }
+
+
+@app.get("/api/schema")
+def api_schema() -> dict[str, tuple[str, ...]]:
+    return supported_values()
+
+
+@app.post("/api/recommend", response_model=RecommendResponse)
+def recommend_endpoint(body: RecommendRequest) -> RecommendResponse | JSONResponse:
+    try:
+        return recommend(body)
+    except ArtifactsUnavailableError as exc:
+        return JSONResponse(
+            status_code=503,
+            content=ErrorResponse(
+                error="artifacts_unavailable",
+                detail=str(exc),
+            ).model_dump(),
+        )
 
 
 @app.api_route("/{full_path:path}", methods=["GET", "POST"])
 def unmatched(request: Request, full_path: str) -> JSONResponse:
-    """Report the path this service actually received.
-
-    Vercel rewrites into a service are final: an unmatched route returns this
-    service's own 404 rather than falling through to the frontend. Echoing the
-    received path turns a silent routing mismatch into a legible one.
-    """
+    """Report the path this service actually received."""
     return JSONResponse(
         status_code=404,
-        content={
-            "error": "no_route",
-            "detail": "Backend service reached, but no route matched.",
-            "received_path": request.url.path,
-        },
+        content=ErrorResponse(
+            error="no_route",
+            detail="Backend service reached, but no route matched.",
+            received_path=request.url.path,
+        ).model_dump(),
     )

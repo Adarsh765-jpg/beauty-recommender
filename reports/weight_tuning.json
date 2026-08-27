@@ -1,0 +1,83 @@
+{
+  "split": "val",
+  "queries": 800,
+  "grid_size": 11,
+  "default_weights": {
+    "w_skin": 0.34,
+    "w_concern": 0.34,
+    "w_text": 0.32
+  },
+  "best_weights": {
+    "w_skin": 0.34,
+    "w_concern": 0.51,
+    "w_text": 0.15
+  },
+  "best_metrics": {
+    "hit_rate@10": 0.0125,
+    "mrr": 0.005734562439859511,
+    "ndcg@10": 0.003906042419388496,
+    "relevant_hit_rate@10": 0.014771048744460856
+  },
+  "top_configs": [
+    {
+      "weights": {
+        "w_skin": 0.34,
+        "w_concern": 0.51,
+        "w_text": 0.15
+      },
+      "hit_rate@10": 0.0125,
+      "mrr": 0.005734562439859511,
+      "ndcg@10": 0.003906042419388496,
+      "relevant_hit_rate@10": 0.014771048744460856,
+      "relevant_mrr": 0.006776440106185537
+    },
+    {
+      "weights": {
+        "w_skin": 0.17,
+        "w_concern": 0.68,
+        "w_text": 0.15
+      },
+      "hit_rate@10": 0.0125,
+      "mrr": 0.005729730277582473,
+      "ndcg@10": 0.003906042419388496,
+      "relevant_hit_rate@10": 0.014771048744460856,
+      "relevant_mrr": 0.0067707300178227155
+    },
+    {
+      "weights": {
+        "w_skin": 0.51,
+        "w_concern": 0.34,
+        "w_text": 0.15
+      },
+      "hit_rate@10": 0.0125,
+      "mrr": 0.00571235682201442,
+      "ndcg@10": 0.003906042419388496,
+      "relevant_hit_rate@10": 0.014771048744460856,
+      "relevant_mrr": 0.006750200085098281
+    },
+    {
+      "weights": {
+        "w_skin": 0.68,
+        "w_concern": 0.17,
+        "w_text": 0.15
+      },
+      "hit_rate@10": 0.0125,
+      "mrr": 0.00561888573081801,
+      "ndcg@10": 0.003906042419388496,
+      "relevant_hit_rate@10": 0.014771048744460856,
+      "relevant_mrr": 0.006639746801557471
+    },
+    {
+      "weights": {
+        "w_skin": 0.34,
+        "w_concern": 0.34,
+        "w_text": 0.32
+      },
+      "hit_rate@10": 0.01125,
+      "mrr": 0.008432938199336621,
+      "ndcg@10": 0.00589692283833023,
+      "relevant_hit_rate@10": 0.013293943870014771,
+      "relevant_mrr": 0.009965067296114176
+    }
+  ]
+}

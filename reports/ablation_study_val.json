@@ -1,0 +1,77 @@
+{
+  "split": "val",
+  "variant_key": "clean__unrestricted",
+  "queries": 800.0,
+  "ablations": {
+    "full": {
+      "flags": {
+        "use_content": true,
+        "use_cohort": true,
+        "use_quality": true
+      },
+      "metrics": {
+        "hit_rate@10": 0.01125,
+        "mrr": 0.008432938199336621,
+        "hit_rate@5": 0.0075,
+        "queries": 800.0
+      },
+      "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_full_val.json"
+    },
+    "no_content": {
+      "flags": {
+        "use_content": false,
+        "use_cohort": true,
+        "use_quality": true
+      },
+      "metrics": {
+        "hit_rate@10": 0.00125,
+        "mrr": 0.0034520175824704685,
+        "hit_rate@5": 0.00125,
+        "queries": 800.0
+      },
+      "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_content_val.json"
+    },
+    "no_cohort": {
+      "flags": {
+        "use_content": true,
+        "use_cohort": false,
+        "use_quality": true
+      },
+      "metrics": {
+        "hit_rate@10": 0.005,
+        "mrr": 0.006339201291714563,
+        "hit_rate@5": 0.005,
+        "queries": 800.0
+      },
+      "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_cohort_val.json"
+    },
+    "no_quality": {
+      "flags": {
+        "use_content": true,
+        "use_cohort": true,
+        "use_quality": false
+      },
+      "metrics": {
+        "hit_rate@10": 0.01125,
+        "mrr": 0.011813557595302617,
+        "hit_rate@5": 0.0075,
+        "queries": 800.0
+      },
+      "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_quality_val.json"
+    }
+  },
+  "comparison": {
+    "full_vs_no_cohort": {
+      "delta_hit_rate@10": 0.0062499999999999995,
+      "delta_mrr": 0.002093736907622058
+    },
+    "full_vs_no_quality": {
+      "delta_hit_rate@10": 0.0,
+      "delta_mrr": -0.0033806193959659957
+    },
+    "full_vs_no_content": {
+      "delta_hit_rate@10": 0.01,
+      "delta_mrr": 0.004980920616866153
+    }
+  }
+}

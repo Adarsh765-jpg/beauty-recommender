@@ -26,7 +26,7 @@ jobs:
           ruff format --check .
 
       - name: Mypy
-        run: mypy backend tests
+        run: mypy backend engine src tests
 
       - name: Pytest
         run: pytest

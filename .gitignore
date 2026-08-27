@@ -49,8 +49,12 @@ venv/
 .pytest_cache/
 .ruff_cache/
 
-# data: raw and intermediate files are reproducible via src/download_data.py.
+# Staged at deploy time by scripts/prepare_backend.py
+backend/engine/
+backend/src/
+backend/data/
 # data/sample/ and data/artifacts/ are intentionally committed.
 /data/raw/
 /data/interim/
+/reports/smoke/
 

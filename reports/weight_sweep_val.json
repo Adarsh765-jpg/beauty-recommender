@@ -1,0 +1,73 @@
+{
+  "split": "val",
+  "variant_key": "clean__unrestricted",
+  "queries": 800.0,
+  "grid": [
+    {
+      "alpha": 0.6,
+      "beta": 0.25,
+      "gamma": 0.15,
+      "hit_rate@10": 0.01125,
+      "mrr": 0.008432938199336621
+    },
+    {
+      "alpha": 0.55,
+      "beta": 0.3,
+      "gamma": 0.15,
+      "hit_rate@10": 0.01625,
+      "mrr": 0.006742927185835277
+    },
+    {
+      "alpha": 0.65,
+      "beta": 0.2,
+      "gamma": 0.15,
+      "hit_rate@10": 0.01125,
+      "mrr": 0.012181837945767765
+    },
+    {
+      "alpha": 0.5,
+      "beta": 0.35,
+      "gamma": 0.15,
+      "hit_rate@10": 0.02,
+      "mrr": 0.005800521763041657
+    },
+    {
+      "alpha": 0.7,
+      "beta": 0.15,
+      "gamma": 0.15,
+      "hit_rate@10": 0.01,
+      "mrr": 0.008321028719821344
+    },
+    {
+      "alpha": 0.6,
+      "beta": 0.15,
+      "gamma": 0.25,
+      "hit_rate@10": 0.01625,
+      "mrr": 0.0076271172413018805
+    },
+    {
+      "alpha": 0.6,
+      "beta": 0.35,
+      "gamma": 0.05,
+      "hit_rate@10": 0.0125,
+      "mrr": 0.008444995377314914
+    }
+  ],
+  "current_weights": {
+    "alpha": 0.6,
+    "beta": 0.25,
+    "gamma": 0.15
+  },
+  "current_metrics": {
+    "hit_rate@10": 0.01125,
+    "mrr": 0.008432938199336621
+  },
+  "best_on_grid": {
+    "alpha": 0.5,
+    "beta": 0.35,
+    "gamma": 0.15,
+    "hit_rate@10": 0.02,
+    "mrr": 0.005800521763041657
+  },
+  "current_is_best": false
+}

@@ -1,0 +1,299 @@
+{
+  "generated_at_utc": "2026-08-26T20:11:29.185807+00:00",
+  "source_files": {
+    "product_info.csv": {
+      "path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\data\\raw\\product_info.csv",
+      "size_bytes": 7904227
+    },
+    "skincare_products_reviews.csv": {
+      "path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\data\\raw\\skincare_products_reviews.csv",
+      "size_bytes": 24193736
+    }
+  },
+  "products": {
+    "row_count": 8494,
+    "column_count": 27,
+    "columns": [
+      "product_id",
+      "product_name",
+      "brand_id",
+      "brand_name",
+      "loves_count",
+      "rating",
+      "reviews",
+      "size",
+      "variation_type",
+      "variation_value",
+      "variation_desc",
+      "ingredients",
+      "price_usd",
+      "value_price_usd",
+      "sale_price_usd",
+      "limited_edition",
+      "new",
+      "online_only",
+      "out_of_stock",
+      "sephora_exclusive",
+      "highlights",
+      "primary_category",
+      "secondary_category",
+      "tertiary_category",
+      "child_count",
+      "child_max_price",
+      "child_min_price"
+    ],
+    "duplicate_product_id_count": 0,
+    "skincare_row_count": 2420,
+    "primary_category_counts": {
+      "Skincare": 2420,
+      "Makeup": 2369,
+      "Hair": 1464,
+      "Fragrance": 1432,
+      "Bath & Body": 405,
+      "Mini Size": 288,
+      "Men": 60,
+      "Tools & Brushes": 52,
+      "Gifts": 4
+    },
+    "missingness": {
+      "ingredients": {
+        "missing_count": 945,
+        "missing_pct": 11.13,
+        "empty_string_count": 0
+      },
+      "highlights": {
+        "missing_count": 2207,
+        "missing_pct": 25.98,
+        "empty_string_count": 0
+      },
+      "price_usd": {
+        "missing_count": 0,
+        "missing_pct": 0.0,
+        "empty_string_count": 0
+      },
+      "rating": {
+        "missing_count": 278,
+        "missing_pct": 3.27,
+        "empty_string_count": 0
+      }
+    },
+    "skincare_missingness": {
+      "ingredients": {
+        "missing_count": 134,
+        "missing_pct": 5.54,
+        "empty_string_count": 0
+      },
+      "highlights": {
+        "missing_count": 417,
+        "missing_pct": 17.23,
+        "empty_string_count": 0
+      }
+    },
+    "price_usd_distribution_skincare": {
+      "count": 2420,
+      "min": 3.0,
+      "p25": 28.0,
+      "median": 44.0,
+      "p75": 70.0,
+      "p90": 110.0,
+      "max": 1900.0,
+      "mean": 60.51
+    },
+    "highlights_skin_signal": {
+      "skincare_with_non_empty_highlights": 2003,
+      "skincare_with_any_skin_keyword_in_highlights": 1124,
+      "skin_keyword_hits": {
+        "dry skin": 95,
+        "oily skin": 33,
+        "combination skin": 21,
+        "normal skin": 660,
+        "all skin types": 0,
+        "for dry": 467,
+        "for oily": 317,
+        "for combination": 21,
+        "for normal": 31,
+        "dryness": 603,
+        "oil-free": 0,
+        "oil control": 0
+      },
+      "top_20_highlights_values": {
+        "['Clean at Sephora', 'Good for: Dryness']": 11,
+        "['Clean at Sephora', 'Vegan']": 9,
+        "['Vegan', 'Clean + Planet Positive']": 9,
+        "['Good for: Dullness/Uneven Texture', 'Clean at Sephora', 'Fragrance Free', 'Good for: Dryness', 'Cruelty-Free']": 8,
+        "['Vegan', 'Clean at Sephora', 'Good for: Dryness']": 7,
+        "['Clean at Sephora', 'Hydrating']": 7,
+        "['Clean at Sephora', 'SPF']": 6,
+        "['Vegan', 'Clean at Sephora']": 6,
+        "['Clean at Sephora']": 6,
+        "['Hyaluronic Acid', 'Hydrating', 'Without Mineral Oil', 'Good for: Dryness', 'Without Parabens', 'Best for Dry, Combo, Normal Skin']": 6,
+        "['Clean at Sephora', 'Best for Dry, Combo, Normal Skin']": 5,
+        "['Good for: Dullness/Uneven Texture', 'Good for: Pores']": 5,
+        "['Vegan', 'Clean at Sephora', 'Without Phthalates', 'Without Parabens', 'Gluten Free']": 5,
+        "['Collagen', 'Hyaluronic Acid', 'Vitamin C', 'Good for: Dryness', 'Good for: Redness', 'Good for: Dark spots']": 5,
+        "['Vegan', 'Hyaluronic Acid', 'Good for: Loss of firmness', 'Clean + Planet Positive', 'Good for: Dryness']": 4,
+        "['Best for Dry, Combo, Normal Skin', 'Good for: Dullness/Uneven Texture', 'Without Sulfates SLS & SLES', 'Without Parabens', 'Without Phthalates']": 4,
+        "['Hyaluronic Acid', 'Cruelty-Free', 'Clean at Sephora']": 4,
+        "['Vegan', 'Without Sulfates SLS & SLES', 'Without Phthalates', 'Without Parabens']": 4,
+        "['Good for: Dullness/Uneven Texture', 'Good for: Pores', 'Good for: Acne/Blemishes', 'Without Parabens', 'Best for Oily, Combo, Normal Skin', 'Niacinamide']": 4,
+        "['Good for: Anti-Aging', 'Gluten Free', 'Vegan', 'Without Triclosan']": 3
+      }
+    }
+  },
+  "reviews": {
+    "row_count": 49977,
+    "column_count": 18,
+    "columns": [
+      "author_id",
+      "rating",
+      "is_recommended",
+      "helpfulness",
+      "total_feedback_count",
+      "total_neg_feedback_count",
+      "total_pos_feedback_count",
+      "submission_time",
+      "review_text",
+      "review_title",
+      "skin_tone",
+      "eye_color",
+      "skin_type",
+      "hair_color",
+      "product_id",
+      "product_name",
+      "brand_name",
+      "price_usd"
+    ],
+    "skin_type_distribution_raw": {
+      "combination": 25172,
+      "dry": 9267,
+      "normal": 6736,
+      "oily": 5171,
+      "nan": 3631
+    },
+    "skin_type_distribution_normalized": {
+      "combination": 25172,
+      "dry": 9267,
+      "normal": 6736,
+      "oily": 5171,
+      "nan": 3631
+    },
+    "observed_skin_types_excluding_nan": [
+      "combination",
+      "dry",
+      "normal",
+      "oily"
+    ],
+    "rating_distribution": {
+      "1": 3928,
+      "2": 2767,
+      "3": 3762,
+      "4": 7811,
+      "5": 31709
+    },
+    "is_recommended": {
+      "is_recommended_present_count": 46160,
+      "is_recommended_present_pct": 92.36,
+      "is_recommended_true_count": 37543,
+      "is_recommended_true_pct_of_present": 81.33,
+      "missing_is_recommended_count": 3817,
+      "rating_gte_4_when_is_recommended_missing": 2956,
+      "rating_vs_is_recommended_agreement_pct": 96.51
+    },
+    "unique_reviewer_count": 38907,
+    "reviews_per_reviewer": {
+      "median": 1.0,
+      "mean": 1.285,
+      "max": 35
+    },
+    "reviews_per_product": {
+      "median": 33.0,
+      "mean": 45.269,
+      "max": 200
+    },
+    "product_skin_type_density": {
+      "total_product_skin_type_cells": 3895,
+      "cell_count_distribution": {
+        "min": 1,
+        "median": 7.0,
+        "mean": 11.899,
+        "max": 94
+      },
+      "threshold_summary": {
+        "3": {
+          "cells_meeting_threshold": 3017,
+          "cells_meeting_threshold_pct": 77.46,
+          "unique_products_with_any_skin_meeting_threshold": 985
+        },
+        "5": {
+          "cells_meeting_threshold": 2445,
+          "cells_meeting_threshold_pct": 62.77,
+          "unique_products_with_any_skin_meeting_threshold": 883
+        },
+        "10": {
+          "cells_meeting_threshold": 1520,
+          "cells_meeting_threshold_pct": 39.02,
+          "unique_products_with_any_skin_meeting_threshold": 707
+        },
+        "15": {
+          "cells_meeting_threshold": 975,
+          "cells_meeting_threshold_pct": 25.03,
+          "unique_products_with_any_skin_meeting_threshold": 588
+        },
+        "20": {
+          "cells_meeting_threshold": 668,
+          "cells_meeting_threshold_pct": 17.15,
+          "unique_products_with_any_skin_meeting_threshold": 491
+        }
+      },
+      "cells_by_skin_type": [
+        {
+          "skin_type": "combination",
+          "count": 1074,
+          "median": 17.0,
+          "mean": 23.438,
+          "max": 94
+        },
+        {
+          "skin_type": "dry",
+          "count": 1004,
+          "median": 6.0,
+          "mean": 9.23,
+          "max": 65
+        },
+        {
+          "skin_type": "normal",
+          "count": 946,
+          "median": 5.0,
+          "mean": 7.121,
+          "max": 38
+        },
+        {
+          "skin_type": "oily",
+          "count": 871,
+          "median": 4.0,
+          "mean": 5.937,
+          "max": 55
+        }
+      ]
+    }
+  },
+  "join_coverage": {
+    "skincare_product_count": 2420,
+    "reviewed_skincare_product_count": 1104,
+    "skincare_products_without_reviews_in_subset": 1316,
+    "review_rows_joined_to_skincare_catalog_pct": 100.0,
+    "review_product_ids_not_in_full_catalog_count": 0
+  },
+  "spec_comparison": {
+    "total_products_8494": true,
+    "skincare_products_2420": true,
+    "review_rows_49977": true,
+    "reviewed_skincare_1104": true,
+    "skincare_no_reviews_1316": true,
+    "is_recommended_present_pct_92_4": true,
+    "ingredients_missing_pct_11_1": true,
+    "highlights_missing_pct_26_0": true,
+    "median_reviews_per_reviewer_1": true,
+    "mean_reviews_per_reviewer_1_28": true
+  }
+}

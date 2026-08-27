@@ -1,0 +1,105 @@
+{
+  "split": "val",
+  "queries": 800,
+  "correlation": {
+    "split": "val",
+    "profile_variant": "text_derived",
+    "candidate_variant": "unrestricted",
+    "observations": 1830400,
+    "labels": [
+      "skin_match",
+      "concern_match",
+      "text_similarity"
+    ],
+    "matrix": [
+      [
+        0.9999999999999998,
+        0.02146621561693228,
+        0.37681719007354375
+      ],
+      [
+        0.02146621561693228,
+        0.9999999999999999,
+        0.11200127425165088
+      ],
+      [
+        0.37681719007354375,
+        0.11200127425165088,
+        1.0
+      ]
+    ],
+    "pairs": {
+      "skin_match__concern_match": 0.02146621561693228,
+      "skin_match__text_similarity": 0.37681719007354375,
+      "concern_match__text_similarity": 0.11200127425165088
+    }
+  },
+  "default_weights": {
+    "w_skin": 0.34,
+    "w_concern": 0.34,
+    "w_text": 0.32
+  },
+  "best_weights": {
+    "w_skin": 0.34,
+    "w_concern": 0.51,
+    "w_text": 0.15
+  },
+  "baseline_comparison": {
+    "clean__unrestricted": {
+      "content": {
+        "hit_rate@10": 0.01125,
+        "mrr": 0.008432938199336621,
+        "relevant_only": {
+          "mrr": 0.009965067296114176,
+          "precision@5": 0.001772525849335303,
+          "recall@5": 0.008862629246676515,
+          "map@5": 0.004431314623338257,
+          "ndcg@5": 0.005591696486600805,
+          "hit_rate@5": 0.008862629246676515,
+          "precision@10": 0.001329394387001477,
+          "recall@10": 0.013293943870014771,
+          "map@10": 0.004964713605777121,
+          "ndcg@10": 0.0069682987749840235,
+          "hit_rate@10": 0.013293943870014771,
+          "precision@20": 0.0016986706056129988,
+          "recall@20": 0.033973412112259974,
+          "map@20": 0.006426149951182992,
+          "ndcg@20": 0.01222731628599298,
+          "hit_rate@20": 0.033973412112259974,
+          "queries": 677.0,
+          "avg_candidate_count": 2288.0,
+          "relevant_only": 1.0
+        }
+      },
+      "popularity": {
+        "hit_rate@10": 0.0,
+        "mrr": 0.0006879599181290217
+      },
+      "random": {
+        "hit_rate@10": 0.0
+      },
+      "rating": {
+        "hit_rate@10": 0.00375
+      }
+    },
+    "clean__category_restricted": {
+      "content_hit_rate@10": 0.1125,
+      "popularity_hit_rate@10": 0.0125
+    }
+  },
+  "tuned_content_unrestricted": {
+    "hit_rate@10": 0.0125,
+    "mrr": 0.005734562439859511
+  },
+  "gate": {
+    "content_beats_popularity_unrestricted": true,
+    "tuned_content_beats_popularity_unrestricted": true,
+    "pass": true,
+    "note": "Gate uses unrestricted clean profile on validation split only. Test split remains untouched."
+  },
+  "reports": {
+    "baseline": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\baseline_val.json",
+    "tuning": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\weight_tuning.json",
+    "tuned": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\baseline_val_tuned.json"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "concern_rules": {
+    "hydration": {
+      "status": "ok",
+      "tagged_reviews": 40626,
+      "untagged_reviews": 9280,
+      "tagged_vocab_rate": 0.2824,
+      "untagged_vocab_rate": 0.1614,
+      "lift": 0.121,
+      "passes_separation": true
+    },
+    "acne_oil_control": {
+      "status": "ok",
+      "tagged_reviews": 11318,
+      "untagged_reviews": 38588,
+      "tagged_vocab_rate": 0.4071,
+      "untagged_vocab_rate": 0.2048,
+      "lift": 0.2023,
+      "passes_separation": true
+    },
+    "brightening": {
+      "status": "ok",
+      "tagged_reviews": 20951,
+      "untagged_reviews": 28955,
+      "tagged_vocab_rate": 0.2454,
+      "untagged_vocab_rate": 0.1005,
+      "lift": 0.1449,
+      "passes_separation": true
+    },
+    "barrier_support": {
+      "status": "ok",
+      "tagged_reviews": 7403,
+      "untagged_reviews": 42503,
+      "tagged_vocab_rate": 0.2021,
+      "untagged_vocab_rate": 0.1285,
+      "lift": 0.0735,
+      "passes_separation": true
+    },
+    "anti_aging": {
+      "status": "ok",
+      "tagged_reviews": 13629,
+      "untagged_reviews": 36277,
+      "tagged_vocab_rate": 0.2005,
+      "untagged_vocab_rate": 0.0778,
+      "lift": 0.1227,
+      "passes_separation": true
+    }
+  },
+  "exclusion_audit": {
+    "fragrance": {
+      "status": "ok",
+      "positive_products": 763,
+      "detected": 763,
+      "recall": 1.0,
+      "passes_recall_gate": true
+    },
+    "drying_alcohol": {
+      "status": "ok",
+      "positive_products": 1371,
+      "detected": 1371,
+      "recall": 1.0,
+      "passes_recall_gate": true
+    }
+  },
+  "text_field_audit": {
+    "products_checked": 2420,
+    "violations": 0,
+    "passes": true
+  },
+  "catalog_summary": {
+    "product_count": 2420,
+    "with_non_empty_text": 2420,
+    "with_derived_concerns": 2227,
+    "with_suited_skin_types": 792,
+    "concern_counts": {
+      "barrier_support": 347,
+      "hydration": 2031,
+      "brightening": 1121,
+      "anti_aging": 626,
+      "acne_oil_control": 561
+    },
+    "suited_skin_type_counts": {
+      "combination": 652,
+      "dry": 467,
+      "normal": 660,
+      "oily": 317
+    }
+  }
+}

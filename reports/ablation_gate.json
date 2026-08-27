@@ -1,0 +1,218 @@
+{
+  "split": "val",
+  "queries": 800.0,
+  "ablations": {
+    "split": "val",
+    "variant_key": "clean__unrestricted",
+    "queries": 800.0,
+    "ablations": {
+      "full": {
+        "flags": {
+          "use_content": true,
+          "use_cohort": true,
+          "use_quality": true
+        },
+        "metrics": {
+          "hit_rate@10": 0.01125,
+          "mrr": 0.008432938199336621,
+          "hit_rate@5": 0.0075,
+          "queries": 800.0
+        },
+        "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_full_val.json"
+      },
+      "no_content": {
+        "flags": {
+          "use_content": false,
+          "use_cohort": true,
+          "use_quality": true
+        },
+        "metrics": {
+          "hit_rate@10": 0.00125,
+          "mrr": 0.0034520175824704685,
+          "hit_rate@5": 0.00125,
+          "queries": 800.0
+        },
+        "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_content_val.json"
+      },
+      "no_cohort": {
+        "flags": {
+          "use_content": true,
+          "use_cohort": false,
+          "use_quality": true
+        },
+        "metrics": {
+          "hit_rate@10": 0.005,
+          "mrr": 0.006339201291714563,
+          "hit_rate@5": 0.005,
+          "queries": 800.0
+        },
+        "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_cohort_val.json"
+      },
+      "no_quality": {
+        "flags": {
+          "use_content": true,
+          "use_cohort": true,
+          "use_quality": false
+        },
+        "metrics": {
+          "hit_rate@10": 0.01125,
+          "mrr": 0.011813557595302617,
+          "hit_rate@5": 0.0075,
+          "queries": 800.0
+        },
+        "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_no_quality_val.json"
+      }
+    },
+    "comparison": {
+      "full_vs_no_cohort": {
+        "delta_hit_rate@10": 0.0062499999999999995,
+        "delta_mrr": 0.002093736907622058
+      },
+      "full_vs_no_quality": {
+        "delta_hit_rate@10": 0.0,
+        "delta_mrr": -0.0033806193959659957
+      },
+      "full_vs_no_content": {
+        "delta_hit_rate@10": 0.01,
+        "delta_mrr": 0.004980920616866153
+      }
+    },
+    "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_study_val.json"
+  },
+  "weight_sweep": {
+    "split": "val",
+    "variant_key": "clean__unrestricted",
+    "queries": 800.0,
+    "grid": [
+      {
+        "alpha": 0.6,
+        "beta": 0.25,
+        "gamma": 0.15,
+        "hit_rate@10": 0.01125,
+        "mrr": 0.008432938199336621
+      },
+      {
+        "alpha": 0.55,
+        "beta": 0.3,
+        "gamma": 0.15,
+        "hit_rate@10": 0.01625,
+        "mrr": 0.006742927185835277
+      },
+      {
+        "alpha": 0.65,
+        "beta": 0.2,
+        "gamma": 0.15,
+        "hit_rate@10": 0.01125,
+        "mrr": 0.012181837945767765
+      },
+      {
+        "alpha": 0.5,
+        "beta": 0.35,
+        "gamma": 0.15,
+        "hit_rate@10": 0.02,
+        "mrr": 0.005800521763041657
+      },
+      {
+        "alpha": 0.7,
+        "beta": 0.15,
+        "gamma": 0.15,
+        "hit_rate@10": 0.01,
+        "mrr": 0.008321028719821344
+      },
+      {
+        "alpha": 0.6,
+        "beta": 0.15,
+        "gamma": 0.25,
+        "hit_rate@10": 0.01625,
+        "mrr": 0.0076271172413018805
+      },
+      {
+        "alpha": 0.6,
+        "beta": 0.35,
+        "gamma": 0.05,
+        "hit_rate@10": 0.0125,
+        "mrr": 0.008444995377314914
+      }
+    ],
+    "current_weights": {
+      "alpha": 0.6,
+      "beta": 0.25,
+      "gamma": 0.15
+    },
+    "current_metrics": {
+      "hit_rate@10": 0.01125,
+      "mrr": 0.008432938199336621
+    },
+    "best_on_grid": {
+      "alpha": 0.5,
+      "beta": 0.35,
+      "gamma": 0.15,
+      "hit_rate@10": 0.02,
+      "mrr": 0.005800521763041657
+    },
+    "current_is_best": false,
+    "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\weight_sweep_val.json"
+  },
+  "embedding_compare": {
+    "split": "val",
+    "variant_key": "clean__unrestricted",
+    "queries": 400,
+    "skipped": false,
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "deployment_cost": {
+      "tfidf_artifact_bytes": {
+        "catalog.json": 5267125,
+        "vocabulary.json": 37019,
+        "idf.npy": 7972,
+        "tfidf.npz": 388798,
+        "meta.json": 430836,
+        "total_bytes": 6131750
+      },
+      "embedding_model_cache_bytes_estimate": 91578455,
+      "cold_start_import_seconds": 3.508,
+      "offline_catalog_encode_seconds": 6.531,
+      "note": "Embeddings are offline-only. Shipped runtime uses TF-IDF artifacts (6,131,750 bytes total)."
+    },
+    "tfidf": {
+      "hit_rate@10": 0.0075,
+      "mrr": 0.006251327037538284
+    },
+    "sentence_transformer": {
+      "hit_rate@10": 0.015,
+      "mrr": 0.006197869184463866
+    },
+    "delta": {
+      "hit_rate@10": 0.0075,
+      "mrr": -5.345785307441821e-05
+    },
+    "reports": {
+      "tfidf": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare_tfidf_val.json",
+      "sentence_transformer": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare_st_val.json"
+    },
+    "report_path": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare.json"
+  },
+  "gate": {
+    "cohort_keeps": true,
+    "cohort_verdict": "Cohort prior kept: full model matches or beats no_cohort on validation (delta hit_rate@10 +0.0062, delta mrr +0.0021)",
+    "ship_tfidf": true,
+    "tfidf_beats_embeddings": false,
+    "embedding_verdict": "Embeddings beat TF-IDF offline (delta hit_rate@10 +0.0075) but TF-IDF remains shipped for artifact size and cold-start constraints",
+    "pass": true,
+    "decisions": {
+      "keep_cohort_prior": true,
+      "ship_tfidf_not_embeddings": true
+    },
+    "headline_metrics": {
+      "full_hit_rate@10": 0.01125,
+      "no_cohort_hit_rate@10": 0.005,
+      "full_mrr": 0.008432938199336621,
+      "no_cohort_mrr": 0.006339201291714563
+    },
+    "note": "Gate uses clean profile + unrestricted candidates on validation only. Negative cohort result means disable cohort in config, not delete code yet."
+  },
+  "reports": {
+    "ablation_study": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\ablation_study_val.json",
+    "weight_sweep": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\weight_sweep_val.json",
+    "embedding_compare": "C:\\Users\\Acer\\OneDrive\\Desktop\\OrboAssignment\\reports\\embedding_compare.json"
+  }
+}
